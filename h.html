@@ -1,0 +1,78 @@
+<html>
+    <body>
+        <script type="text/javascript">
+            //نمایش اطلاعات در مرورگر
+            function Display(content, showresult){
+                showresult.innerHTML = content;
+            }
+            //دریافت اطلاعات فایل متنی
+            function Retrieve(url){
+                var AjaxCaching = false;
+                var showresult = document.getElementById("showresult");
+                var Request = CreateRequest();
+               
+                Request.onreadystatechange = function(){
+                    if(Request.readyState == 4){
+                        if(Request.status == 200){
+                            var content = Request.responseText;
+                            Display(content, showresult);
+                        }
+                    }
+                };
+                
+                if(AjaxCaching == false){
+                    url = url + "?nocache=" + Math.random();
+                }
+                Request.open("GET", url, true);
+                Request.send(null);
+            }
+            //شروع درخواست
+            function SubmitForm(){
+                var Request = CreateRequest();
+                var script = "ajax-copy-get.php";
+                var filename = "ajax-copy-get.txt";
+                Request.onreadystatechange = function(){
+                    if(Request.readyState == 4){
+                        Retrieve(filename);
+                    }
+                };
+                Request.open("POST", script, true);       
+                Request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                Request.send(null);       
+            }
+            </script>
+            <php>
+            // فایل بر روی سرور دیگر یا همان سرور
+            $url = "ajax-copy-get.txt";     
+            // گرفتن محتویات فایل
+            $content = file_get_contents($url);
+            // کپی محتویات فایل داخل فایلی دیگر
+            $nfile = fopen("ajax-copy-get2.txt", "w");
+            if($nfile != false){
+                fwrite($nfile, $content);
+                fclose($nfile);
+            }   
+            /php>
+            meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>وبگو | ارسال درخواست آژاکسی و کپی فایل</title>
+<!-- http://webgoo.ir -->
+<style type="text/css">
+body{
+    font-family:Tahoma, Geneva, sans-serif;
+    font-size:12px;
+    direction:rtl;
+}
+</style>
+<script src="ajax.js" type="text/javascript"></script>
+<script src="ajax-copy-get.js" type="text/javascript"></script>
+</head>
+
+<form action="" method="post" name="ajax">
+<input type="button" id="submit" name="button" onclick="SubmitForm()" value="ارسال درخواست آژاکسی">
+</form>
+<div id="showresult">
+نتیجه اینجا نشان داده می شود!
+</div>
+
+    </body>
+</html>
